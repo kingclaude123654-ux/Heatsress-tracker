@@ -15,7 +15,10 @@ class MedGulfApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Heat Stress Monitor',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
       home: const MainScreen(),
     );
   }
@@ -63,7 +66,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-// --- PAGE 1: REPORT ---
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
 
@@ -77,12 +79,10 @@ class _ReportPageState extends State<ReportPage> {
   bool _isProcessing = false;
   String _resultText = "";
 
-  // Variables for extracted data
   double _temp = 0.0;
   double _humidity = 0.0;
   double _heatIdx = 0.0;
 
-  // 1. FUNCTION TO PICK AND ANALYZE IMAGE
   Future<void> _pickAndAnalyzeImage(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
     final XFile? imageFile = await picker.pickImage(source: source);
@@ -95,7 +95,6 @@ class _ReportPageState extends State<ReportPage> {
       _resultText = "Analyzing image... This may take a moment.";
     });
 
-    // 2. LOCAL TEXT RECOGNITION (ML KIT)
     final inputImage = InputImage.fromFilePath(imageFile.path);
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
     
@@ -103,27 +102,18 @@ class _ReportPageState extends State<ReportPage> {
       final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
       String fullText = recognizedText.text;
       
-      // 3. EXTRACT NUMBERS FROM TEXT
-      // This uses Regex to find all numbers (including decimals)
       RegExp regExp = RegExp(r'(\d+\.?\d*)');
       Iterable<RegExpMatch> matches = regExp.allMatches(fullText);
-      
       List<double> numbers = matches.map((m) => double.tryParse(m.group(0)!) ?? 0.0).toList();
       
-      // 4. LOGIC TO ASSIGN NUMBERS TO DATA
-      // Since we don't know the exact format of the Kestrel meter,
-      // we assume the first 3 numbers found are: Temperature, Humidity, Heat Index.
       if (numbers.length >= 3) {
         _temp = numbers[0];
         _humidity = numbers[1];
         _heatIdx = numbers[2];
+        _generateReport();
       } else {
-        _resultText = "Error: Could not detect enough numbers in the image. Please ensure the meter screen is clear.";
-        return;
+        _resultText = "Error: Could not detect enough numbers. Ensure the screen is clear.";
       }
-
-      // 5. GENERATE THE REPORT USING YOUR CHART
-      _generateReport();
 
     } catch (e) {
       setState(() {
@@ -137,7 +127,6 @@ class _ReportPageState extends State<ReportPage> {
     }
   }
 
-  // 6. YOUR EXACT LOGIC AND CHART
   void _generateReport() {
     String flagColor = "";
     String risk = "";
@@ -176,8 +165,7 @@ class _ReportPageState extends State<ReportPage> {
       water = "Standard hydration";
     }
 
-    // Qatar Time & Date formatting
-    DateTime now = DateTime.now().toUtc().add(const Duration(hours: 3)); // UTC+3 for Qatar
+    DateTime now = DateTime.now().toUtc().add(const Duration(hours: 3));
     String date = DateFormat('dd/MM/yyyy').format(now);
     String time = DateFormat('hh:mm a').format(now);
 
@@ -265,7 +253,6 @@ class _ReportPageState extends State<ReportPage> {
           ),
           const SizedBox(height: 20),
 
-          // Generate Button (Will just re-run the report based on existing numbers)
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
