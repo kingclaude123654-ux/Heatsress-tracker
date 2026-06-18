@@ -3,41 +3,33 @@ name: Build Android APK
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     
     steps:
-    # Step 1: Checkout the code
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # Step 2: Setup Java (required for Android builds)
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
         java-version: '11'
 
-    # Step 3: Setup Flutter
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
         flutter-version: '3.19.0'
         channel: 'stable'
 
-    # Step 4: Install dependencies
     - name: Install dependencies
       run: flutter pub get
 
-    # Step 5: Build the Android APK (Release mode)
     - name: Build APK
       run: flutter build apk --release
 
-    # Step 6: Upload the APK as an Artifact (v4 updated syntax)
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
