@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build APK
 
 on:
   push:
@@ -7,8 +7,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
     steps:
       - name: Checkout
@@ -19,24 +17,23 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install EAS CLI directly
-        run: npm install -g eas-cli
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Login to Expo
-        run: npx eas-cli whoami
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
 
       - name: Build APK
-        run: npx eas-cli build --platform android --profile preview --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: cd android && ./gradlew assembleDebug
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: medgulf-hse-apk
-          path: ./build/app.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
