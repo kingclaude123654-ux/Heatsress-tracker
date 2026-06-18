@@ -1,0 +1,16 @@
+name: heat_stress_app
+description: A heat stress management app for MEDGULF.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  image_picker: ^1.1.2
+  intl: ^0.19.0
+
+flutter:
+  uses-material-design: true
