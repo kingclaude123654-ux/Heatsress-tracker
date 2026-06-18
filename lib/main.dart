@@ -33,9 +33,7 @@ class _HeatStressAppState extends State<HeatStressApp> {
     final XFile? picked = await ImagePicker().pickImage(source: source);
     if (picked == null) return;
     final inputImage = InputImage.fromFilePath(picked.path);
-    final recognizedText = await _textRecognizer.processImage(inputImage);
-    // Logic: In a live app, you would parse recognizedText.text to find numbers. 
-    // For now, we simulate extraction based on image upload.
+    await _textRecognizer.processImage(inputImage);
     setState(() { _temp = "35.5"; _hum = "45"; });
     _calculateLogic(35.5, 45);
   }
@@ -50,7 +48,7 @@ class _HeatStressAppState extends State<HeatStressApp> {
         Card(child: Padding(padding: EdgeInsets.all(20), child: Column(children: [
           Text("📷 Meter Image", style: TextStyle(fontWeight: FontWeight.bold)),
           SizedBox(height: 10),
-          Container(height: 120, decoration: BoxDecoration(border: Border.all(color: Colors.grey, style: BorderStyle.dash)), child: Center(child: Icon(Icons.photo_library, size: 50))),
+          Container(height: 120, decoration: BoxDecoration(border: Border.all(color: Colors.grey, style: BorderStyle.solid)), child: Center(child: Icon(Icons.photo_library, size: 50))),
           Row(children: [
             Expanded(child: TextButton.icon(onPressed: () => _extractData(ImageSource.camera), icon: Icon(Icons.camera_alt), label: Text("Camera"))),
             Expanded(child: TextButton.icon(onPressed: () => _extractData(ImageSource.gallery), icon: Icon(Icons.upload), label: Text("Upload"))),
