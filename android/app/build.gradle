@@ -1,14 +1,14 @@
 apply plugin: "com.android.application"
-apply plugin: "com.facebook.react"
 
 android {
     namespace "com.medgulf.hse"
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdkVersion 34
+    buildToolsVersion "34.0.0"
 
     defaultConfig {
         applicationId "com.medgulf.hse"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion 23
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
     }
@@ -21,13 +21,22 @@ android {
             minifyEnabled false
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 }
 
 dependencies {
-    implementation("com.facebook.react:react-android")
-    implementation("com.facebook.react:hermes-android")
+    implementation "com.facebook.react:react-native:0.73.6"
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 }
 
-react {
-    entryFile = file("../../index.js")
+repositories {
+    mavenCentral()
+    google()
+    maven { url "https://www.jitpack.io" }
+    maven { url "$rootDir/../node_modules/react-native/android" }
 }
