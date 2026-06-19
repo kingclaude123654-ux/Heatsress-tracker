@@ -1,24 +1,20 @@
-apply plugin: "com.android.application"
+apply plugin: 'com.android.application'
 
 android {
-    namespace "com.medgulf.hse"
+    namespace 'com.medgulf.hse'
     compileSdkVersion 34
-    buildToolsVersion "34.0.0"
 
     defaultConfig {
-        applicationId "com.medgulf.hse"
+        applicationId 'com.medgulf.hse'
         minSdkVersion 23
         targetSdkVersion 34
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
     }
 
     buildTypes {
         debug {
             debuggable true
-        }
-        release {
-            minifyEnabled false
         }
     }
 
@@ -29,14 +25,6 @@ android {
 }
 
 dependencies {
-    implementation "com.facebook.react:react-native:0.73.6"
-    implementation "androidx.appcompat:appcompat:1.6.1"
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
-}
-
-repositories {
-    mavenCentral()
-    google()
-    maven { url "https://www.jitpack.io" }
-    maven { url "$rootDir/../node_modules/react-native/android" }
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.webkit:webkit:1.8.0'
 }
