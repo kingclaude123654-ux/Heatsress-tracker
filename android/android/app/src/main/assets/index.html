@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MEDGULF HSE</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: sans-serif; background: #f0f2f5; min-height: 100vh; }
+  .header { background: #1a2a5e; padding: 16px; display: flex; align-items: center; gap: 12px; padding-top: 40px; }
+  .header-icon { font-size: 32px; }
+  .header-title { color: #fff; font-size: 18px; font-weight: 700; }
+  .header-sub { color: #aac4ff; font-size: 12px; }
+  .tabs { display: flex; background: #fff; border-bottom: 1px solid #e0e0e0; }
+  .tab { flex: 1; padding: 12px 0; background: none; border: none; border-bottom: 3px solid transparent; color: #888; font-size: 13px; cursor: pointer; }
+  .tab.active { border-bottom-color: #1a2a5e; color: #1a2a5e; font-weight: 700; }
+  .content { padding: 16px; }
+  .card { background: #fff; border-radius: 16px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+  .card-title { font-weight: 700; font-size: 15px; margin-bottom: 12px; }
+  .upload-box { border: 2px dashed #c0c8e0; border-radius: 12px; padding: 28px 16px; text-align: center; background: #f7f9ff; }
+  .upload-icon { font-size: 40px; margin-bottom: 8px; }
+  .upload-text { color: #888; font-size: 13px; margin-bottom: 16px; }
+  .btn-row { display: flex; gap: 10px; justify-content: center; }
+  .btn { background: #1a2a5e; color: #fff; border: none; border-radius: 10px; padding: 11px 18px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .btn-outline { background: #fff; color: #1a2a5e; border: 2px solid #1a2a5e; }
+  .btn-full { width: 100%; padding: 14px; font-size: 16px; margin-bottom: 14px; border-radius: 12px; }
+  .btn-green { background: #388e3c; }
+  .preview-img { width: 100%; max-height: 220px; object-fit: contain; border-radius: 10px; background: #f5f5f5; display: block; margin-bottom: 10px; }
+  .retake-row { display: flex; gap: 8px; }
+  .retake-btn { flex: 1; background: #e8eaf6; color: #1a2a5e; border: none; border-radius: 8px; padding: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  select, input[type=text] { width: 100%; padding: 10px 12px; border: 1px solid #d0d7e8; border-radius: 10px; font-size: 14px; margin-bottom: 8px; }
+  .loc-row { display: flex; gap: 8px; }
+  .loc-row select { flex: 1; margin-bottom: 0; }
+  .add-btn { background: #1a2a5e; color: #fff; border: none; border-radius: 10px; width: 42px; height: 42px; font-size: 22px; cursor: pointer; flex-shrink: 0; }
+  .add-row { display: flex; gap: 8px; margin-top: 10px; }
+  .add-row input { flex: 1; margin-bottom: 0; }
+  .error { background: #ffebee; color: #c62828; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 14px; }
+  .flag-banner { border-radius: 10px; padding: 12px; text-align: center; font-weight: 700; font-size: 18px; margin-bottom: 12px; }
+  .metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .metric { background: #f7f9ff; border-radius: 10px; padding: 10px 6px; text-align: center; }
+  .metric-icon { font-size: 22px; }
+  .metric-val { font-weight: 700; font-size: 16px; }
+  .metric-lbl { color: #888; font-size: 11px; }
+  .info-box { background: #1a2a5e; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+  .report-text { color: #e8f0fe; font-size: 12px; line-height: 20px; white-space: pre-wrap; font-family: monospace; }
+  .ref-row { border-left: 4px solid; padding: 10px; margin-bottom: 2px; border-radius: 4px; }
+  .ref-range { font-weight: 700; font-size: 13px; }
+  .ref-detail { font-size: 12px; color: #555; margin-top: 2px; }
+  .hist-card { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+  .hist-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .badge { border-radius: 20px; padding: 2px 10px; font-size: 11px; font-weight: 600; display: inline-block; }
+  .meta { font-size: 12px; color: #666; margin-top: 3px; }
+  .section-title { font-weight: 700; font-size: 16px; margin-bottom: 10px; margin-top: 8px; }
+  .empty { text-align: center; color: #888; padding: 40px; }
+  .hidden { display: none; }
+  .loading { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">🌡️</div>
+  <div>
+    <div class="header-title">Heat Stress Monitor</div>
+    <div class="header-sub">🛡️ MEDGULF HSE Dashboard</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('report')">📋 Report</button>
+  <button class="tab" onclick="switchTab('dashboard')">📊 Dashboard</button>
+  <button class="tab" onclick="switchTab('history')">🗂️ History</button>
+</div>
+
+<!-- REPORT TAB -->
+<div id="tab-report" class="content">
+  <div class="card">
+    <div class="card-title">📷 Meter Image</div>
+    <div id="upload-area" class="upload-box">
+      <div class="upload-icon">🖼️</div>
+      <div class="upload-text">Take a photo or upload an image of the<br>temperature/humidity meter</div>
+      <div class="btn-row">
+        <label class="btn" style="cursor:pointer">
+          📷 Take Photo
+          <input type="file" accept="image/*" capture="environment" onchange="handleFile(this)" style="display:none">
+        </label>
+        <label class="btn btn-outline" style="cursor:pointer">
+          ⬆️ Upload
+          <input type="file" accept="image/*" onchange="handleFile(this)" style="display:none">
+        </label>
+      </div>
+    </div>
+    <div id="preview-area" class="hidden">
+      <img id="preview-img" class="preview-img" src="" alt="meter">
+      <div class="retake-row">
+        <label class="retake-btn" style="cursor:pointer">
+          📷 Retake
+          <input type="file" accept="image/*" capture="environment" onchange="handleFile(this)" style="display:none">
+        </label>
+        <label class="retake-btn" style="cursor:pointer">
+          🔄 Change
+          <input type="file" accept="image/*" onchange="handleFile(this)" style="display:none">
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📍 Location</div>
+    <div class="loc-row">
+      <select id="loc-select" onchange="document.getElementById('loc-input').value=this.value">
+        <option value="">— Select location —</option>
+        <option value="Corridor F area 1">Corridor F area 1</option>
+        <option value="Main Gate">Main Gate</option>
+        <option value="Workshop A">Workshop A</option>
+      </select>
+      <button class="add-btn" onclick="toggleAddLoc()">+</button>
+    </div>
+    <input type="text" id="loc-input" placeholder="Or type location here" value="Corridor F area 1">
+    <div id="add-loc-row" class="add-row hidden">
+      <input type="text" id="new-loc" placeholder="New location name" style="margin-bottom:0">
+      <button class="btn btn-green" onclick="addLocation()" style="white-space:nowrap;padding:9px 14px">Add</button>
+    </div>
+  </div>
+
+  <div id="error-box" class="error hidden"></div>
+
+  <button class="btn btn-full" id="gen-btn" onclick="generateReport()">⚡ Generate Report</button>
+
+  <div id="result-area" class="card hidden">
+    <div id="flag-banner" class="flag-banner"></div>
+    <div class="metrics">
+      <div class="metric"><div class="metric-icon">🌡️</div><div class="metric-val" id="m-temp">--</div><div class="metric-lbl">Temp</div></div>
+      <div class="metric"><div class="metric-icon">💧</div><div class="metric-val" id="m-hum">--</div><div class="metric-lbl">Humidity</div></div>
+      <div class="metric"><div class="metric-icon">🔥</div><div class="metric-val" id="m-hi">--</div><div class="metric-lbl">Heat Index</div></div>
+    </div>
+    <div class="info-box"><pre class="report-text" id="report-text"></pre></div>
+    <button class="btn btn-full" id="copy-btn" onclick="copyReport()" style="margin-bottom:0">📋 Copy Report</button>
+  </div>
+</div>
+
+<!-- DASHBOARD TAB -->
+<div id="tab-dashboard" class="content hidden">
+  <div class="section-title">📊 Recent Readings</div>
+  <div id="dashboard-list"><div class="empty">No data yet. Generate a report first.</div></div>
+  <div class="section-title">📋 Heat Index Reference</div>
+  <div id="ref-chart"></div>
+</div>
+
+<!-- HISTORY TAB -->
+<div id="tab-history" class="content hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div class="section-title" style="margin:0">🗂️ All Reports</div>
+    <button onclick="clearHistory()" style="background:#ffebee;color:#c62828;border:none;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-weight:600">Clear All</button>
+  </div>
+  <div id="history-list"><div class="empty">No history yet.</div></div>
+</div>
+
+<script>
+const HEAT_CHART = [
+  { min:54, max:999, flag:'Red 🔴', risk:'Extreme Danger', wr:'---', water:'Stop all work', color:'#d32f2f', tc:'#fff' },
+  { min:50, max:53,  flag:'Red 🔴', risk:'Extreme Danger', wr:'20:10', water:'1 cup every 10 min', color:'#d32f2f', tc:'#fff' },
+  { min:39, max:49,  flag:'Orange 🟠', risk:'Danger', wr:'30:10', water:'1 cup every 15 min', color:'#f57c00', tc:'#fff' },
+  { min:32, max:38,  flag:'Yellow 🟡', risk:'Extreme Caution', wr:'40:10', water:'1 cup every 20 min', color:'#f9a825', tc:'#000' },
+  { min:27, max:31,  flag:'Green 🟢', risk:'Caution', wr:'50:10', water:'1 cup every 20 min', color:'#388e3c', tc:'#fff' },
+];
+const REFS = [
+  { range:'27–31°C', flag:'Green 🟢', risk:'Caution', wr:'50:10', water:'1 cup/20 min', bg:'#e8f5e9', border:'#388e3c' },
+  { range:'32–38°C', flag:'Yellow 🟡', risk:'Extreme Caution', wr:'40:10', water:'1 cup/20 min', bg:'#fffde7', border:'#f9a825' },
+  { range:'39–49°C', flag:'Orange 🟠', risk:'Danger', wr:'30:10', water:'1 cup/15 min', bg:'#fff3e0', border:'#f57c00' },
+  { range:'50–53°C', flag:'Red 🔴', risk:'Extreme Danger', wr:'20:10', water:'1 cup/10 min', bg:'#ffebee', border:'#d32f2f' },
+  { range:'54°C+',   flag:'Red 🔴', risk:'Stop Work', wr:'—', water:'Stop all work', bg:'#ffcdd2', border:'#b71c1c' },
+];
+
+let imageBase64 = null;
+let history = JSON.parse(localStorage.getItem('hse_history') || '[]');
+let currentReport = null;
+
+function getLevel(hi) { return HEAT_CHART.find(r => hi >= r.min && hi <= r.max) || null; }
+
+function getQatarTime() {
+  const now = new Date();
+  const q = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Qatar' }));
+  const h = q.getHours(), m = q.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hh = h % 12 || 12;
+  const mm = String(m).padStart(2,'0');
+  const dd = String(q.getDate()).padStart(2,'0');
+  const mo = String(q.getMonth()+1).padStart(2,'0');
+  return { time:`${hh}:${mm} ${ampm}`, date:`${dd}/${mo}/${q.getFullYear()}` };
+}
+
+function switchTab(t) {
+  ['report','dashboard','history'].forEach(k => {
+    document.getElementById('tab-'+k).classList.toggle('hidden', k !== t);
+    document.querySelectorAll('.tab')[['report','dashboard','history'].indexOf(k)].classList.toggle('active', k === t);
+  });
+  if (t === 'dashboard') renderDashboard();
+  if (t === 'history') renderHistory();
+}
+
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const src = e.target.result;
+    imageBase64 = src.split(',')[1];
+    document.getElementById('preview-img').src = src;
+    document.getElementById('upload-area').classList.add('hidden');
+    document.getElementById('preview-area').classList.remove('hidden');
+    document.getElementById('result-area').classList.add('hidden');
+    document.getElementById('error-box').classList.add('hidden');
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function toggleAddLoc() {
+  document.getElementById('add-loc-row').classList.toggle('hidden');
+}
+
+function addLocation() {
+  const val = document.getElementById('new-loc').value.trim();
+  if (!val) return;
+  const sel = document.getElementById('loc-select');
+  const opt = document.createElement('option');
+  opt.value = val; opt.text = val;
+  sel.appendChild(opt);
+  sel.value = val;
+  document.getElementById('loc-input').value = val;
+  document.getElementById('new-loc').value = '';
+  document.getElementById('add-loc-row').classList.add('hidden');
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-box');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.remove('hidden');
+}
+
+async function generateReport() {
+  if (!imageBase64) { showError('Please upload or take a photo first.'); return; }
+  const loc = document.getElementById('loc-input').value.trim() || 'Corridor F area 1';
+  document.getElementById('error-box').classList.add('hidden');
+  const btn = document.getElementById('gen-btn');
+  btn.innerHTML = '<div class="loading"><div class="spinner"></div> Analyzing Image...</div>';
+  btn.disabled = true;
+  document.getElementById('result-area').classList.add('hidden');
+
+  try {
+    const { time, date } = getQatarTime();
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 } },
+            { type: 'text', text: 'Extract temperature (°C), humidity (%), and heat index (°C) from this meter image. Respond ONLY with JSON no markdown: {"temperature": <number>, "humidity": <number>, "heatIndex": <number>}' }
+          ]
+        }]
+      })
+    });
+    const data = await resp.json();
+    let raw = (data.content || []).map(b => b.text || '').join('');
+    raw = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(raw);
+    const { temperature: temp, humidity, heatIndex: hi } = parsed;
+    const level = getLevel(hi);
+    const isStop = hi >= 54;
+    const report = `*Company* : MEDGULF\n*Location* : ${loc}\n*Time* : ${time}\n*Date* : ${date}\n*Temp* : ${temp}°C\n*Humidity* : ${humidity}%\n*Heat Index* : ${hi}°C\n*Flag Colour* : ${level?.flag || 'Red 🔴'}\n*Risk* : ${level?.risk || 'Extreme Danger'}\n*Work/Rest* : ${isStop ? 'Stop all work' : level?.wr}\n*Water Consumption* : ${isStop ? 'Stop all work' : level?.water}`;
+
+    currentReport = report;
+    document.getElementById('flag-banner').textContent = (level?.flag || 'Red 🔴') + '  ' + (level?.risk || 'Extreme Danger');
+    document.getElementById('flag-banner').style.background = level?.color || '#d32f2f';
+    document.getElementById('flag-banner').style.color = level?.tc || '#fff';
+    document.getElementById('m-temp').textContent = temp + '°C';
+    document.getElementById('m-hum').textContent = humidity + '%';
+    document.getElementById('m-hi').textContent = hi + '°C';
+    document.getElementById('report-text').textContent = report;
+    document.getElementById('result-area').classList.remove('hidden');
+    document.getElementById('copy-btn').textContent = '📋 Copy Report';
+    document.getElementById('copy-btn').style.background = '#1a2a5e';
+
+    const entry = { temp, humidity, hi, level, loc, time, date, report };
+    history = [entry, ...history].slice(0, 50);
+    localStorage.setItem('hse_history', JSON.stringify(history));
+  } catch(e) {
+    showError('Could not read meter values. Please try a clearer image.');
+  }
+
+  btn.innerHTML = '⚡ Generate Report';
+  btn.disabled = false;
+}
+
+function copyReport() {
+  if (!currentReport) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(currentReport).then(() => {
+      document.getElementById('copy-btn').textContent = '✅ Copied!';
+      document.getElementById('copy-btn').style.background = '#388e3c';
+      setTimeout(() => {
+        document.getElementById('copy-btn').textContent = '📋 Copy Report';
+        document.getElementById('copy-btn').style.background = '#1a2a5e';
+      }, 2000);
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = currentReport;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    document.getElementById('copy-btn').textContent = '✅ Copied!';
+    setTimeout(() => document.getElementById('copy-btn').textContent = '📋 Copy Report', 2000);
+  }
+}
+
+function renderDashboard() {
+  const el = document.getElementById('dashboard-list');
+  if (!history.length) { el.innerHTML = '<div class="empty">No data yet.</div>'; }
+  else {
+    el.innerHTML = history.slice(0,10).map(d => `
+      <div class="hist-card" style="border-left:4px solid ${d.level?.color||'#888'}">
+        <div class="hist-row">
+          <strong>${d.loc}</strong>
+          <span class="badge" style="background:${d.level?.color};color:${d.level?.tc}">${d.level?.risk}</span>
+        </div>
+        <div class="meta">🌡️ ${d.temp}°C &nbsp; 💧 ${d.humidity}% &nbsp; 🔥 HI: ${d.hi}°C</div>
+        <div class="meta">${d.date} ${d.time}</div>
+      </div>`).join('');
+  }
+  const rc = document.getElementById('ref-chart');
+  rc.innerHTML = REFS.map(r => `
+    <div class="ref-row" style="background:${r.bg};border-left-color:${r.border}">
+      <div class="ref-range">${r.range} &nbsp; ${r.flag}</div>
+      <div class="ref-detail">${r.risk} | ${r.wr} | ${r.water}</div>
+    </div>`).join('');
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (!history.length) { el.innerHTML = '<div class="empty">No history yet.</div>'; return; }
+  el.innerHTML = history.map(d => `
+    <div class="hist-card">
+      <div class="hist-row">
+        <strong style="font-size:13px">${d.loc}</strong>
+        <span class="badge" style="background:${d.level?.color};color:${d.level?.tc}">${d.level?.flag}</span>
+      </div>
+      <div class="meta">${d.date} ${d.time}</div>
+      <div class="meta">🌡️ ${d.temp}°C &nbsp; 💧 ${d.humidity}% &nbsp; 🔥 ${d.hi}°C</div>
+    </div>`).join('');
+}
+
+function clearHistory() {
+  history = [];
+  localStorage.removeItem('hse_history');
+  renderHistory();
+}
+</script>
+</body>
+</html>
