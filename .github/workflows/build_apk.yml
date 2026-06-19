@@ -23,6 +23,12 @@ jobs:
         with:
           gradle-version: '8.6'
 
+      - name: Create assets folder and copy HTML
+        run: |
+          mkdir -p android/app/src/main/assets
+          cp android/app/src/main/assets/index.html android/app/src/main/assets/index.html 2>/dev/null || true
+          ls -la android/app/src/main/assets/
+
       - name: Build APK
         run: cd android && gradle assembleDebug
 
